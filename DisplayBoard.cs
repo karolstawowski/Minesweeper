@@ -18,12 +18,15 @@ namespace Minesweeper
             {
                 case 0:
                     Console.SetWindowSize(34, 28);
+                    Console.SetBufferSize(34, 28);
                     break;
                 case 1:
                     Console.SetWindowSize(42, 32);
+                    Console.SetBufferSize(42, 32);
                     break;
                 case 2:
                     Console.SetWindowSize(70, 46);
+                    Console.SetBufferSize(70, 46);
                     break;
             }
         }

@@ -22,6 +22,7 @@ namespace Minesweeper
         {
             Console.Clear();
             Console.SetWindowSize(47, 18);
+            Console.SetBufferSize(47, 18);
             Console.WriteLine("Thanks for playing the game!");
             Console.WriteLine("Minesweeper implementation by Karol Stawowski");
             Console.ReadKey();

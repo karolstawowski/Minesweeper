@@ -101,6 +101,7 @@ namespace Minesweeper
             Console.Title = "Minesweeper by Karol Stawowski";
 
             Console.SetWindowSize(44, 8);
+            Console.SetBufferSize(44, 8);
 
             Game.SetGameDifficulty();
 
