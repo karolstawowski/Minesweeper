@@ -13,20 +13,21 @@ namespace Minesweeper
             -1,0,1
         };
 
-        public bool isOpen = false;
         int row = -1;
         int column = -1;
-        public bool isMine;
-        public int mineNeighbours;
-        public Cell(bool isOpen, int row, int column, bool isMine, int mineNeighbours)
+        public bool IsOpen = false;
+        public bool IsMine;
+        public int MinesAround;
+
+        public Cell(bool isOpen, int row, int column, bool isMine, int minesAround)
         {
-            this.isOpen = isOpen;
+            this.IsOpen = isOpen;
             this.row = row;
             this.column = column;
-            this.isMine = isMine;
-            this.mineNeighbours = mineNeighbours;
+            this.IsMine = isMine;
+            this.MinesAround = minesAround;
         }
-        public static void getNeighbours(Cell[,] array)
+        public static void GetMinesAround(Cell[,] array)
         {
             int neighboursCount = 0;
             for (int i = 0; i < array.GetLength(0); i++)
@@ -39,7 +40,7 @@ namespace Minesweeper
                         {
                             try
                             {
-                                if (array[i + row, j + col].isMine)
+                                if (array[i + row, j + col].IsMine)
                                 {
                                     if (row != 0 || col != 0)
                                     {
@@ -50,13 +51,13 @@ namespace Minesweeper
                             catch (Exception) { }
                         }
                     }
-                    array[i, j].mineNeighbours = neighboursCount;
+                    array[i, j].MinesAround = neighboursCount;
                     neighboursCount = 0;
                 }
             }
         }
 
-        public static void CheckBlankNeighbours(Cell[,] test, int X, int Y)
+        public static void CheckEmptyCellsAround(Cell[,] test, int X, int Y)
         {
             foreach (int row in neighboursLocations)
             {
@@ -64,53 +65,19 @@ namespace Minesweeper
                 {
                     try
                     {
-                        if (test[Y + row, X + col].mineNeighbours == 0 && !test[Y + row, X + col].isOpen && !test[Y + row, X + col].isMine)
+                        if (test[Y + row, X + col].MinesAround == 0 && !test[Y + row, X + col].IsOpen && !test[Y + row, X + col].IsMine)
                         {
-                            test[Y + row, X + col].isOpen = true;
-                            CheckBlankNeighbours(test, X + col, Y + row);
+                            test[Y + row, X + col].IsOpen = true;
+                            CheckEmptyCellsAround(test, X + col, Y + row);
                         }
-                        else if(test[Y + row, X + col].mineNeighbours != 0 && !test[Y + row, X + col].isMine)
+                        else if(test[Y + row, X + col].MinesAround != 0 && !test[Y + row, X + col].IsMine)
                         {
-                            test[Y + row, X + col].isOpen = true;
+                            test[Y + row, X + col].IsOpen = true;
                         }
                     }
                     catch (Exception) { };
                 }
             }
-        }
-
-        public static void DisplayNeighboursNumberTest()
-        {
-            for (int i = 0; i < Board.gameBoard.GetLength(0); i++)
-            {
-                for (int j = 0; j < Board.gameBoard.GetLength(1); j++)
-                {
-                    Console.Write(Board.gameBoard[i, j].mineNeighbours + " ");
-                }
-                Console.WriteLine("");
-            }
-            Console.WriteLine();
-        }
-
-        public static void DisplayMine()
-        {
-            Console.Write(" ");
-            Console.ForegroundColor = ConsoleColor.Black;
-            Console.BackgroundColor = ConsoleColor.Red;
-            Console.Write("X");
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.Write(" |");
-        }
-
-        public static void DisplayOpenCell(int yAxis, int xAxis)
-        {
-            Console.Write($" {Board.gameBoard[yAxis, xAxis].mineNeighbours} |");
-        }
-
-        public static void DisplayClosedCell(int yAxis, int xAxis)
-        {
-            Console.Write(" # |");
         }
     }
 }

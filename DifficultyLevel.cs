@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Minesweeper
 {
-    public class DifficultyLevels
+    public class DifficultyLevel
     {
         public enum DifficultyLevelsEnum
         {

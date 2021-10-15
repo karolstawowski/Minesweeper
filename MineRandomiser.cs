@@ -20,9 +20,9 @@ namespace Minesweeper
                 int X = random.Next(0, boardWidth);
                 int Y = random.Next(0, boardHeight);
 
-                if (board[Y, X].isMine == false)
+                if (board[Y, X].IsMine == false)
                 {
-                    board[Y, X].isMine = true;
+                    board[Y, X].IsMine = true;
                     numberOfGeneratedMines++;
                 }
             }

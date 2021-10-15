@@ -10,13 +10,14 @@ namespace Minesweeper
     {
         static bool isOver = false;
 
-        public static DifficultyLevels.DifficultyLevelsEnum gameDifficulty;
+        public static DifficultyLevel.DifficultyLevelsEnum gameDifficulty;
 
-        public static void SetDifficulty()
+        public static void SetGameDifficulty()
         {
+            char userInput = Char.MinValue;
+
             Console.WriteLine("Select difficulty level: ");
             Console.WriteLine("[(B)eginner, (I)ntermediate, (E)xprert]");
-            char userInput = Char.MinValue;
             
             while (userInput != 'B' && userInput != 'I' && userInput != 'E')
             {
@@ -26,28 +27,29 @@ namespace Minesweeper
 
                     if(userInput != 'B' && userInput != 'I' && userInput != 'E')
                     {
-                        throw new Exception("Invalid character");
+                        throw new ArgumentException("Invalid character");
                     }
                 }
                 catch (Exception)
                 {
                     Console.WriteLine("Invalid character");
                 }
+
                 switch (userInput)
                 {
                     case 'B':
                         {
-                            Game.gameDifficulty = DifficultyLevels.DifficultyLevelsEnum.Beginner;
+                            Game.gameDifficulty = DifficultyLevel.DifficultyLevelsEnum.Beginner;
                         }
                         break;
                     case 'I':
                         {
-                            Game.gameDifficulty = DifficultyLevels.DifficultyLevelsEnum.Intermediate;
+                            Game.gameDifficulty = DifficultyLevel.DifficultyLevelsEnum.Intermediate;
                         }
                         break;
                     case 'E':
                         {
-                            Game.gameDifficulty = DifficultyLevels.DifficultyLevelsEnum.Expert;
+                            Game.gameDifficulty = DifficultyLevel.DifficultyLevelsEnum.Expert;
                         }
                         break;
                 }
@@ -62,52 +64,36 @@ namespace Minesweeper
 
         public static void DisplayMinesToFind()
         {
-            Console.WriteLine("Mines to find: " + Board.minesNumbers[(int)gameDifficulty]);
+            Console.WriteLine("Mines to find: " + Board.GetMinesNumber((int)gameDifficulty));
         }
 
         public static void CheckUserLocationInput(ref int input, char inputType)
         {
             int boardAxisMeasurement = 0;
+            bool isParsed;
+
             if (inputType == 'x')
             {
-                boardAxisMeasurement = Board.boardWidth;
+                boardAxisMeasurement = Board.BoardWidth;
             }
             else if (inputType == 'y')
             {
-                boardAxisMeasurement = Board.boardHeight;
+                boardAxisMeasurement = Board.BoardHeight;
             }
-            while (input < 0 || input > boardAxisMeasurement)
+            while (input < 0 || input >= boardAxisMeasurement)
             {
-                try
+                isParsed = int.TryParse(Console.ReadLine(), out int number);
+                if(isParsed && number > 0 && number <= boardAxisMeasurement)
                 {
-                    input = Convert.ToInt32(Console.ReadLine()) - 1;
-                    if (input < 0 || input > boardAxisMeasurement)
-                    {
-                        throw new Exception("Invalid value");
-                    }
+                    input = number - 1;
+                    return;
                 }
-                catch (Exception)
-                {
-                    Console.WriteLine("Invalid value");
-                };
+
+                Console.WriteLine("Invalid value");
             }
         }
 
-        public static void ChangeWindowSize(DifficultyLevels.DifficultyLevelsEnum difficultyLevel)
-        {
-            if((int)difficultyLevel == 0)
-            {
-                Console.SetWindowSize(34, 28);
-            }
-            else if ((int)difficultyLevel == 1)
-            {
-                Console.SetWindowSize(42, 32);
-            }
-            else if((int)difficultyLevel == 2)
-            {
-                Console.SetWindowSize(70, 46);
-            }
-        }
+        
         public static void PlayGame()
         {
             Game.isOver = false;
@@ -116,11 +102,9 @@ namespace Minesweeper
 
             Console.SetWindowSize(44, 8);
 
-            Game.SetDifficulty();
+            Game.SetGameDifficulty();
 
             Console.Clear();
-
-            ChangeWindowSize(gameDifficulty);
 
             Board.SetBoardSize();
 
@@ -128,14 +112,16 @@ namespace Minesweeper
 
             Board.AssingMines();
 
-            Cell.getNeighbours(Board.gameBoard);
+            Cell.GetMinesAround(Board.GameBoard);
+
+            DisplayBoard.ChangeWindowSize(gameDifficulty);
 
             // Display board for developing purposes
-            //Board.DisplayMineLocationsTest();
+            //DisplayBoard.DisplayMinesLocationTest();
             //Cell.DisplayNeighboursNumberTest();
 
             Game.DisplayDifficultyLevel();
-            Board.DisplayOpenAndNeighbouringCells();
+            DisplayBoard.DisplayOpenAndNeighbouringCells();
 
             do
             {
@@ -150,20 +136,20 @@ namespace Minesweeper
                 Game.DisplayDifficultyLevel();
 
                 // Mine has been clicked - game is lost
-                if (Board.gameBoard[yAxis, xAxis].isMine)
+                if (Board.GameBoard[yAxis, xAxis].IsMine)
                 {
                     Game.isOver = true;
 
-                    Board.DisplayGameOverBoard();
+                    DisplayBoard.DisplayGameOverBoard();
 
                     Alert.GameOverAlert();
                 }
                 // Cell number of neighbouring mines is equal zero - open neighbour cells
-                else if (Board.gameBoard[yAxis, xAxis].mineNeighbours == 0)
+                else if (Board.GameBoard[yAxis, xAxis].MinesAround == 0)
                 {
-                    Cell.CheckBlankNeighbours(Board.gameBoard, xAxis, yAxis);
+                    Cell.CheckEmptyCellsAround(Board.GameBoard, xAxis, yAxis);
 
-                    if (Board.DisplayOpenAndNeighbouringCells() == Board.maxOpenCells[(int)gameDifficulty])
+                    if (DisplayBoard.DisplayOpenAndNeighbouringCells() == Board.GetMaxOpenCellsNumber((int)gameDifficulty))
                     {
                         Game.isOver = true;
                         break;
@@ -172,9 +158,9 @@ namespace Minesweeper
                 // Cell has >0 neighbouring mines
                 else
                 {
-                    Board.gameBoard[yAxis, xAxis].isOpen = true;
+                    Board.GameBoard[yAxis, xAxis].IsOpen = true;
 
-                    if (Board.DisplayOpenAndNeighbouringCells() == Board.maxOpenCells[(int)gameDifficulty])
+                    if (DisplayBoard.DisplayOpenAndNeighbouringCells() == Board.GetMaxOpenCellsNumber((int)gameDifficulty))
                     {
                         Game.isOver = true;
                         Alert.GameWonAlert();
