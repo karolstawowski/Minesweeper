@@ -9,6 +9,8 @@
 This is my own Console App implementation of single player game called 'Minesweeper' made by Robert Donner. 
 The objective of the game is to open all cells of the board, which don't contain mines.
 
+<img src="preview.png">
+
 <a href="https://en.wikipedia.org/wiki/Minesweeper_(video_game)">Here are full game rules.</a>
 
 ## Tools and technologies
